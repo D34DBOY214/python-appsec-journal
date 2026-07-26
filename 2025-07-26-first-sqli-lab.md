@@ -1,6 +1,30 @@
-# 2025-07-26 First SQL Injection Lab
+  # First SQL Injection Lab — PortSwigger
+                                                                                                                                                                                                             **Date:** 2025-07-26
+  **Type:** Lab
+  **Lab:** SQL injection vulnerability in WHERE clause allowing retrieval of hidden data
+                                                                                                                                                                                                             ## What the lab asked
 
- The lab asked me to perform a SQL injection attack to cause the application to display one or more unreleased products.
- I clicked a product category and added `'+OR+1=1--` to the end of the URL parameter.
- The application ignored its normal filtering rules, forced a true condition, and unlocked all products including unreleased ones, solving the lab.
-- I am still a bit unsure how the database handles the comment characters (`--`) to safely ignore the rest of the original query.
+  The shop page shows products filtered by category, like:
+
+  ```text
+  /filter?category=Gifts
+  
+  Some products are marked as unreleased. The goal was to display all products, including unreleased ones.
+
+  Why the app is vulnerable
+
+  The application takes the category value from the URL and pastes it directly into a SQL query. It does not use a parameter or prepared statement.
+
+  Likely original query:
+
+  SELECT * FROM products WHERE category = 'Gifts' AND released = 1
+
+  Because the category value is inserted directly, I can change the query logic bysending special characters.
+
+  The payload I used
+
+  /filter?category='+OR+1=1--
+
+  Decoded, that becomes:
+
+  ' OR 1=1--
